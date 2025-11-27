@@ -116,7 +116,7 @@ export default function DemoRequestModal({ isOpen, onClose }: DemoRequestModalPr
       const scrollContainer = modalRef.current?.querySelector('.modal-scrollbar') as HTMLElement;
       if (scrollContainer) {
         scrollContainer.style.scrollBehavior = "smooth";
-        scrollContainer.style.webkitOverflowScrolling = "touch";
+        (scrollContainer.style as any).webkitOverflowScrolling = "touch";
       }
 
       return () => {
@@ -445,7 +445,7 @@ function FloatingCard({
   color,
   delay,
 }: {
-  icon: React.ComponentType<{ size?: number; weight?: string; className?: string }>;
+  icon: React.ComponentType<any>;
   title: string;
   description: string;
   color: string;
