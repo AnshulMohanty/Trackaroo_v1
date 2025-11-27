@@ -15,10 +15,10 @@ const benefits = [
     icon: "revenue",
   },
   {
-    title: "Save 20+ Hours Weekly",
+    title: "Boost Operational Efficiency by 40%",
     description: "Automate repetitive tasks and streamline processes to focus on growing your business instead of managing paperwork.",
-    stat: "Time saved per week on administrative tasks",
-    icon: "time",
+    stat: "Average efficiency improvement measured across workflows",
+    icon: "efficiency",
   },
   {
     title: "99.9% Data Security",
@@ -31,6 +31,18 @@ const benefits = [
     description: "Real-time collaboration tools and mobile access keep your team connected and productive from anywhere.",
     stat: "Better coordination across all departments",
     icon: "productivity",
+  },
+  {
+    title: "Faster Decision-Making with AI Insights",
+    description: "Get instant analytics and actionable insights to make smarter, quicker operational decisions.",
+    stat: "AI-powered metrics for clearer and faster business direction",
+    icon: "ai",
+  },
+  {
+    title: "Reduce Inventory Loss by 25%",
+    description: "Track stock movement accurately, minimise shrinkage, and maintain optimal inventory levels.",
+    stat: "Data based on customer-reported reductions in errors and wastage.",
+    icon: "inventory",
   },
 ];
 
@@ -70,27 +82,81 @@ function RevenueIcon() {
   );
 }
 
-function TimeIcon() {
+function EfficiencyIcon() {
   return (
     <div className="relative w-12 h-12 flex items-center justify-center">
-      <div className="absolute inset-0 bg-cyan-400/20 rounded-full" />
+      <div className="absolute inset-0 bg-cyan-400/20 rounded-lg rotate-45" />
       <svg className="relative w-8 h-8" viewBox="0 0 24 24" fill="none">
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
+        <path
+          d="M13 2L3 14H12L11 22L21 10H12L13 2Z"
           stroke="currentColor"
           strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           className="text-cyan-400"
         />
+      </svg>
+    </div>
+  );
+}
+
+function AIIcon() {
+  return (
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      <div className="absolute inset-0 bg-cyan-400/20 rounded-lg" />
+      <svg className="relative w-8 h-8" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="3" stroke="currentColor" strokeWidth="2" className="text-cyan-400" />
         <path
-          d="M12 6V12L16 14"
+          d="M12 11V14M12 14L9 17M12 14L15 17"
           stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           className="text-cyan-400"
         />
-        <circle cx="12" cy="12" r="1.5" fill="currentColor" className="text-cyan-400" />
+        <path
+          d="M3 21C3 17.134 6.13401 14 10 14C13.866 14 17 17.134 17 21"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className="text-cyan-400"
+        />
+        <circle cx="19" cy="5" r="2" fill="currentColor" className="text-cyan-400" />
+        <circle cx="5" cy="5" r="2" fill="currentColor" className="text-cyan-400" />
+      </svg>
+    </div>
+  );
+}
+
+function InventoryIcon() {
+  return (
+    <div className="relative w-12 h-12 flex items-center justify-center">
+      <div className="absolute inset-0 bg-cyan-400/20 rounded-lg" />
+      <svg className="relative w-8 h-8" viewBox="0 0 24 24" fill="none">
+        <rect
+          x="3"
+          y="7"
+          width="18"
+          height="14"
+          rx="2"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-cyan-400"
+        />
+        <path
+          d="M7 7V5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V7"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-cyan-400"
+        />
+        <path
+          d="M12 11V17M9 14H15"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className="text-cyan-400"
+        />
+        <circle cx="8" cy="19" r="1" fill="currentColor" className="text-cyan-400" />
+        <circle cx="16" cy="19" r="1" fill="currentColor" className="text-cyan-400" />
       </svg>
     </div>
   );
@@ -166,9 +232,11 @@ function ProductivityIcon() {
 
 const iconMap: Record<string, React.ComponentType> = {
   revenue: RevenueIcon,
-  time: TimeIcon,
+  efficiency: EfficiencyIcon,
   security: SecurityIcon,
   productivity: ProductivityIcon,
+  ai: AIIcon,
+  inventory: InventoryIcon,
 };
 
 export default function Diagnosis() {
@@ -181,57 +249,319 @@ export default function Diagnosis() {
 
     if (!container || !content) return;
 
-    const cards = content.querySelectorAll(".benefit-card");
+    const cards = Array.from(content.querySelectorAll(".benefit-card")) as HTMLElement[];
 
     // Ensure section is visible initially
     gsap.set(container, { opacity: 1, visibility: "visible" });
 
-    ScrollTrigger.create({
-      trigger: container,
-      start: "top top",
-      end: () => `+=${Math.max(300, content.scrollWidth - window.innerWidth + 200)}`,
-      pin: true,
-      pinSpacing: true,
-      scrub: 0.5,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      onEnter: () => {
-        // Ensure visibility on enter
-        gsap.set(container, { opacity: 1, visibility: "visible" });
-      },
-      onUpdate: (self) => {
-        const progress = self.progress;
-        const maxScroll = Math.max(0, content.scrollWidth - window.innerWidth);
-        const translateX = -progress * maxScroll;
+    // Calculate card positions for centering
+    const calculateCardPositions = () => {
+      const viewportWidth = window.innerWidth;
+      const viewportCenter = viewportWidth / 2;
+      const rightOffset = 200; // Start cards more to the right
+      
+      return cards.map((card) => {
+        const cardLeftRelative = card.offsetLeft;
+        const cardWidth = card.offsetWidth;
+        const cardCenterRelative = cardLeftRelative + cardWidth / 2;
+        const targetX = viewportCenter - cardCenterRelative + rightOffset;
+        return targetX;
+      });
+    };
 
-        gsap.to(content, {
-          x: translateX,
-          duration: 0.1,
-          ease: "none",
-        });
+    // Enhanced highlight function with smooth popup and glow
+    const highlightCard = (card: HTMLElement) => {
+      if (!card || !card.isConnected) return;
+      card.classList.remove("opacity-50");
+      card.classList.add("opacity-100", "card-highlighted");
+      
+      // Smooth popup effect with gentle scale
+      gsap.to(card, {
+        scale: 1.06,
+        duration: 0.6,
+        ease: "power2.out",
+        force3D: true,
+        overwrite: true
+      });
 
-        // Animate cards on scroll
-        cards.forEach((card, index) => {
-          const threshold = index * 0.25;
+      // Smooth animated border glow
+      gsap.to(card, {
+        boxShadow: "0 0 30px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1)",
+        borderColor: "rgba(0, 255, 255, 0.8)",
+        duration: 0.6,
+        ease: "power2.out",
+        force3D: true,
+        overwrite: true
+      });
+    };
 
-          if (progress > threshold) {
-            card.classList.remove("opacity-50");
-            card.classList.add("opacity-100", "scale-105");
-          } else {
+    // Smooth dim card function
+    const dimCard = (card: HTMLElement) => {
+      if (!card || !card.isConnected) return;
+      card.classList.add("opacity-50");
+      card.classList.remove("opacity-100", "card-highlighted");
+      
+      gsap.to(card, {
+        scale: 1,
+        boxShadow: "none",
+        borderColor: "rgba(255, 255, 255, 0.1)",
+        duration: 0.5,
+        ease: "power2.out",
+        force3D: true,
+        overwrite: true
+      });
+    };
+
+    let scrollTrigger: ScrollTrigger | null = null;
+    let lastHighlightedCard: HTMLElement | null = null;
+
+    // Initialize positions and highlight first card
+    const initializePositions = () => {
+      // Wait for layout to be complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const positions = calculateCardPositions();
+          if (positions.length > 0 && positions[0] !== undefined && !isNaN(positions[0])) {
+            // Start first card more to the right (add extra offset)
+            const initialOffset = positions[0] + 150; // Start 150px more to the right
+            gsap.set(content, { 
+              x: initialOffset,
+              immediateRender: true
+            });
+          }
+          // Dim all cards first
+          cards.forEach((card) => {
             card.classList.add("opacity-50");
-            card.classList.remove("opacity-100", "scale-105");
+            card.classList.remove("opacity-100", "card-highlighted");
+            gsap.set(card, { scale: 1, boxShadow: "none", borderColor: "rgba(255, 255, 255, 0.1)" });
+          });
+          // Highlight first card initially
+          if (cards.length > 0) {
+            highlightCard(cards[0]);
+            lastHighlightedCard = cards[0];
           }
         });
-      },
-    });
+      });
+    };
+
+    // Setup scroll trigger
+    const setupScrollTrigger = () => {
+      const positions = calculateCardPositions();
+      
+      if (positions.length === 0) return;
+
+      const firstCardX = positions[0] + 150; // Account for initial right offset
+      const lastCardX = positions[positions.length - 1];
+      const scrollDistance = Math.abs(lastCardX - firstCardX);
+      const totalCards = cards.length;
+      
+      scrollTrigger = ScrollTrigger.create({
+        trigger: container,
+        start: "top top",
+        end: `+=${scrollDistance + window.innerHeight * 0.5}`,
+        pin: true,
+        pinSpacing: true,
+        scrub: 1.5,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        markers: false,
+        onEnter: () => {
+          gsap.set(container, { opacity: 1, visibility: "visible" });
+          // Ensure first card starts more to the right
+          const positions = calculateCardPositions();
+          if (positions.length > 0 && positions[0] !== undefined) {
+            const initialOffset = positions[0] + 150; // Start 150px more to the right
+            gsap.set(content, { x: initialOffset });
+          }
+          // Dim all cards first
+          cards.forEach((card) => {
+            dimCard(card);
+          });
+          // Highlight first card
+          if (cards.length > 0) {
+            highlightCard(cards[0]);
+            lastHighlightedCard = cards[0];
+          }
+        },
+        onUpdate: (self) => {
+          const progress = self.progress;
+          const currentPositions = calculateCardPositions();
+          
+          if (totalCards === 0 || currentPositions.length === 0) return;
+          
+          // Handle initial state - ensure first card starts more to the right when progress is 0
+          if (progress <= 0.01) {
+            const firstCardX = currentPositions[0] ?? 0;
+            const initialOffset = firstCardX + 150; // Start 150px more to the right
+            gsap.set(content, { x: initialOffset, force3D: true });
+            if (lastHighlightedCard !== cards[0]) {
+              if (lastHighlightedCard) {
+                dimCard(lastHighlightedCard);
+              }
+              highlightCard(cards[0]);
+              lastHighlightedCard = cards[0];
+            }
+            return;
+          }
+          
+          // Calculate which card should be centered based on progress
+          // Adjust progress to account for initial left offset of first card
+          const adjustedProgress = progress;
+          const cardProgress = adjustedProgress * (totalCards - 1);
+          const currentIndex = Math.min(Math.floor(cardProgress), totalCards - 1);
+          const nextIndex = Math.min(currentIndex + 1, totalCards - 1);
+          const localProgress = cardProgress - currentIndex;
+          
+          // Smooth interpolation between card positions
+          let currentX = currentPositions[currentIndex] ?? 0;
+          let nextX = currentIndex === nextIndex ? currentX : (currentPositions[nextIndex] ?? 0);
+          
+          // If we're transitioning from first card's right position to center
+          if (currentIndex === 0) {
+            const initialOffset = currentX + 150;
+            // Smoothly transition from right offset to center over first 25% of scroll with easing
+            if (progress < 0.25) {
+              const transitionProgress = progress / 0.25;
+              // Use easing function for smoother transition
+              const easedProgress = 1 - Math.pow(1 - transitionProgress, 3); // ease-out cubic
+              currentX = initialOffset + (currentX - initialOffset) * easedProgress;
+            }
+          }
+          
+          const translateX = currentX + (nextX - currentX) * localProgress;
+
+          // Use smooth animation with easing for relaxed feel
+          gsap.to(content, {
+            x: translateX,
+            duration: 0.3,
+            ease: "power1.out",
+            force3D: true,
+            overwrite: true
+          });
+
+          // Find the card closest to center for highlighting
+          let closestCard: HTMLElement | null = null;
+          let minDistance = Infinity;
+          let closestIndex = 0;
+
+          cards.forEach((card, index) => {
+            const cardRect = card.getBoundingClientRect();
+            const viewportCenter = window.innerWidth / 2;
+            const cardCenter = cardRect.left + cardRect.width / 2;
+            const distanceFromCenter = Math.abs(viewportCenter - cardCenter);
+
+            if (distanceFromCenter < minDistance) {
+              minDistance = distanceFromCenter;
+              closestCard = card;
+              closestIndex = index;
+            }
+          });
+
+          // Highlight the closest card if it's within threshold (with hysteresis to prevent jitter)
+          const highlightThreshold = 350;
+          if (closestCard && minDistance < highlightThreshold) {
+            // Only update if card changed or if significantly closer to avoid jitter
+            const shouldUpdate = lastHighlightedCard !== closestCard || 
+                                 (lastHighlightedCard && minDistance < 200);
+            
+            if (shouldUpdate) {
+              // Dim previous card smoothly
+              if (lastHighlightedCard && lastHighlightedCard !== closestCard) {
+                dimCard(lastHighlightedCard);
+              }
+              // Highlight new card smoothly
+              if (lastHighlightedCard !== closestCard) {
+                highlightCard(closestCard);
+                lastHighlightedCard = closestCard;
+              }
+            }
+          }
+
+          // Dim all other cards smoothly
+          cards.forEach((card, index) => {
+            if (card !== closestCard || minDistance >= highlightThreshold) {
+              if (card !== lastHighlightedCard) {
+                dimCard(card);
+              }
+            }
+          });
+
+          // At the end (progress > 0.95), ensure last card is highlighted
+          if (progress > 0.95 && totalCards > 0) {
+            const lastCard = cards[totalCards - 1];
+            if (lastHighlightedCard !== lastCard) {
+              if (lastHighlightedCard) {
+                dimCard(lastHighlightedCard);
+              }
+              highlightCard(lastCard);
+              lastHighlightedCard = lastCard;
+            }
+          }
+        },
+        onLeave: () => {
+          // When leaving section, ensure smooth transition
+          if (lastHighlightedCard) {
+            dimCard(lastHighlightedCard);
+          }
+        },
+      });
+    };
+
+    // Wait for layout before setting up
+    let initTimeout: NodeJS.Timeout;
+    initTimeout = setTimeout(() => {
+      initializePositions();
+      requestAnimationFrame(() => {
+        setupScrollTrigger();
+        ScrollTrigger.refresh();
+      });
+    }, 100);
+
+    // Throttled resize handler
+    let resizeTimeout: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (scrollTrigger) {
+          scrollTrigger.kill();
+          scrollTrigger = null;
+        }
+        lastHighlightedCard = null;
+        initializePositions();
+        requestAnimationFrame(() => {
+          setupScrollTrigger();
+          ScrollTrigger.refresh();
+        });
+      }, 250);
+    };
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      if (initTimeout) {
+        clearTimeout(initTimeout);
+      }
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      window.removeEventListener("resize", handleResize);
+      if (scrollTrigger) {
+        scrollTrigger.kill();
+        scrollTrigger = null;
+      }
+      cards.forEach((card) => {
+        if (card && card.isConnected) {
+          gsap.killTweensOf(card);
+        }
+      });
+      if (content) {
+        gsap.killTweensOf(content);
+      }
     };
   }, []);
 
   return (
     <section
+      id="about"
       ref={containerRef}
       className="relative w-full min-h-screen overflow-hidden bg-[#0a0e27]"
       style={{ opacity: 1, visibility: "visible" }}
@@ -264,18 +594,30 @@ export default function Diagnosis() {
       </div>
 
       {/* Scrollable Cards Container */}
-      <div className="absolute top-0 left-0 w-full h-full flex items-center pt-56 z-20">
+      <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pt-56 z-20 overflow-visible">
         <div
           ref={contentRef}
-          className="flex items-center gap-6 md:gap-8 px-8 md:px-16"
-          style={{ width: "max-content" }}
+          className="flex items-center gap-6 md:gap-8 px-4 md:px-8"
+          style={{ 
+            width: "max-content", 
+            willChange: "transform",
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden"
+          }}
         >
           {benefits.map((benefit, index) => {
             const IconComponent = iconMap[benefit.icon];
             return (
               <div
                 key={index}
-                className="benefit-card flex-shrink-0 w-[320px] md:w-[400px] bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-8 transition-all duration-500 opacity-50 z-20 hover:border-cyan-400/30"
+                className={`benefit-card flex-shrink-0 w-[320px] md:w-[400px] bg-black/50 backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-8 transition-all duration-500 ease-out z-20 hover:border-cyan-400/30 relative ${
+                  index === 0 ? "opacity-100" : "opacity-50"
+                }`}
+                style={{ 
+                  transformOrigin: "center center",
+                  willChange: "transform, opacity",
+                  transform: "translateZ(0)"
+                }}
               >
                 <div className="flex items-start gap-4 mb-4">
                   {IconComponent && <IconComponent />}

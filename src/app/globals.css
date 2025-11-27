@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+/* Smooth scrolling optimizations */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Performance optimizations */
+section {
+  contain: layout style paint;
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* Optimize animations for GPU acceleration */
+[style*="animation"],
+[class*="animate-"] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce motion for better performance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @theme {
   /* 1. Define Custom Colors directly here */
   --color-navy: #0B1120;
@@ -67,6 +104,111 @@
       text-shadow: 0 0 15px rgba(0, 255, 255, 1),
         0 0 30px rgba(0, 255, 255, 0.8),
         0 0 45px rgba(0, 255, 255, 0.6);
+    }
+  }
+
+  /* Continuous Glitch Effect */
+  @keyframes textGlitch {
+    0%, 100% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-1px, 1px);
+    }
+    40% {
+      transform: translate(-1px, -1px);
+    }
+    60% {
+      transform: translate(1px, 1px);
+    }
+    80% {
+      transform: translate(1px, -1px);
+    }
+  }
+
+  @keyframes glitchLayer1 {
+    0%, 100% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    10% {
+      transform: translate(-2px, 2px);
+      opacity: 0.8;
+    }
+    20% {
+      transform: translate(2px, -2px);
+      opacity: 0;
+    }
+    30% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    40% {
+      transform: translate(-1px, -1px);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translate(1px, 1px);
+      opacity: 0;
+    }
+    60% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    70% {
+      transform: translate(2px, 2px);
+      opacity: 0.7;
+    }
+    80% {
+      transform: translate(-2px, -2px);
+      opacity: 0;
+    }
+    90% {
+      transform: translate(0);
+      opacity: 0;
+    }
+  }
+
+  @keyframes glitchLayer2 {
+    0%, 100% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    15% {
+      transform: translate(2px, -2px);
+      opacity: 0.7;
+    }
+    25% {
+      transform: translate(-2px, 2px);
+      opacity: 0;
+    }
+    35% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    45% {
+      transform: translate(1px, 1px);
+      opacity: 0.6;
+    }
+    55% {
+      transform: translate(-1px, -1px);
+      opacity: 0;
+    }
+    65% {
+      transform: translate(0);
+      opacity: 0;
+    }
+    75% {
+      transform: translate(-2px, 2px);
+      opacity: 0.8;
+    }
+    85% {
+      transform: translate(2px, -2px);
+      opacity: 0;
+    }
+    95% {
+      transform: translate(0);
+      opacity: 0;
     }
   }
 
@@ -179,6 +321,11 @@
   @keyframes iconFloat {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-5px); }
+  }
+
+  @keyframes dashMove {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 10; }
   }
 
   @keyframes pulseLine {
@@ -367,6 +514,371 @@
     100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
   }
 
+  @keyframes underlineFlow {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes underlineGlow {
+    0% {
+      opacity: 0.15;
+      transform: translateX(-20%);
+    }
+    50% {
+      opacity: 0.8;
+      transform: translateX(40%);
+    }
+    100% {
+      opacity: 0.15;
+      transform: translateX(110%);
+    }
+  }
+
+  @keyframes underlineTilt {
+    0% {
+      transform: perspective(600px) rotateX(0deg);
+    }
+    50% {
+      transform: perspective(600px) rotateX(12deg);
+    }
+    100% {
+      transform: perspective(600px) rotateX(0deg);
+    }
+  }
+
+  @keyframes underlineTracer {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(250%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes underlinePulse {
+    0%, 100% {
+      opacity: 0.15;
+      transform: translateX(-30%) scaleX(0.8);
+    }
+    50% {
+      opacity: 0.45;
+      transform: translateX(30%) scaleX(1);
+    }
+  }
+
+  @keyframes underlineBaseShift {
+    0% {
+      transform: translateZ(0) rotateX(0deg);
+      background-position: 0% 50%;
+    }
+    50% {
+      transform: translateZ(12px) rotateX(8deg);
+      background-position: 100% 50%;
+    }
+    100% {
+      transform: translateZ(0) rotateX(0deg);
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes underlineRoll {
+    0% {
+      opacity: 0.4;
+      transform: rotateY(-15deg);
+    }
+    50% {
+      opacity: 0.8;
+      transform: rotateY(15deg);
+    }
+    100% {
+      opacity: 0.4;
+      transform: rotateY(-15deg);
+    }
+  }
+
+  @keyframes underlineOrb {
+    0% {
+      transform: translateX(0%) translateY(-50%);
+    }
+    50% {
+      transform: translateX(300%) translateY(-65%);
+    }
+    100% {
+      transform: translateX(600%) translateY(-50%);
+    }
+  }
+
+  @keyframes underlineSweep {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+
+  @keyframes underlineBreath {
+    0%, 100% {
+      opacity: 0.2;
+      transform: scaleY(0.9);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scaleY(1.2);
+    }
+  }
+
+  @keyframes underlineSpark {
+    0% {
+      transform: translate(-10%, -50%) scale(0.8);
+    }
+    50% {
+      transform: translate(320%, -50%) scale(1.1);
+    }
+    100% {
+      transform: translate(640%, -50%) scale(0.8);
+    }
+  }
+
+  @keyframes underlineSparkRing {
+    0% {
+      opacity: 0.2;
+      transform: translate(-20%, -50%) scale(0.5);
+    }
+    50% {
+      opacity: 0.7;
+      transform: translate(320%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(660%, -50%) scale(0.4);
+    }
+  }
+
+  @keyframes underlineDash {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: -16px 0;
+    }
+  }
+
+  @keyframes underlineWave {
+    0% {
+      background-position: 0% 50%;
+      transform: skewX(0deg);
+    }
+    50% {
+      background-position: 150% 50%;
+      transform: skewX(-6deg) scaleY(1.05);
+    }
+    100% {
+      background-position: 0% 50%;
+      transform: skewX(0deg);
+    }
+  }
+
+  @keyframes underlineGlowPulse {
+    0%, 100% {
+      opacity: 0.15;
+      transform: scaleY(0.9);
+    }
+    50% {
+      opacity: 0.55;
+      transform: scaleY(1.2);
+    }
+  }
+
+  @keyframes underlineSweepAlt {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(220%);
+    }
+  }
+
+  @keyframes underlineSparkSecondary {
+    0% {
+      transform: translate(-50%, -50%) scale(0.7);
+    }
+    50% {
+      transform: translate(250%, -50%) scale(1);
+    }
+    100% {
+      transform: translate(520%, -50%) scale(0.7);
+    }
+  }
+
+  @keyframes underlineBreathScale {
+    0%, 100% {
+      transform: scaleY(0.9);
+      box-shadow: 0 12px 24px rgba(0, 255, 255, 0.2);
+    }
+    50% {
+      transform: scaleY(1.1);
+      box-shadow: 0 16px 32px rgba(0, 255, 255, 0.35);
+    }
+  }
+
+  @keyframes underlineAura {
+    0%, 100% {
+      opacity: 0.25;
+      transform: scaleX(0.8);
+    }
+    50% {
+      opacity: 0.7;
+      transform: scaleX(1.1);
+    }
+  }
+
+  @keyframes underlineBeamFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }
+
+  @keyframes underlineBeamPulse {
+    0%, 100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 0.65;
+    }
+  }
+
+  @keyframes underlineBeamHighlight {
+    0% {
+      transform: translateX(-120%);
+    }
+    100% {
+      transform: translateX(220%);
+    }
+  }
+
+  @keyframes underlinePulseDot {
+    0% {
+      transform: translate(-10%, -50%) scale(0.8);
+    }
+    50% {
+      transform: translate(310%, -50%) scale(1.1);
+    }
+    100% {
+      transform: translate(630%, -50%) scale(0.8);
+    }
+  }
+
+  @keyframes underlinePulseRing {
+    0% {
+      opacity: 0.2;
+      transform: translate(-20%, -50%) scale(0.5);
+    }
+    50% {
+      opacity: 0.7;
+      transform: translate(320%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(660%, -50%) scale(0.5);
+    }
+  }
+
+  @keyframes underlineSlide {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 220% 50%; }
+  }
+
+  @keyframes underlineGlowOrbit {
+    0% { opacity: 0.2; transform: scaleY(0.9); }
+    50% { opacity: 0.7; transform: scaleY(1.2); }
+    100% { opacity: 0.2; transform: scaleY(0.9); }
+  }
+
+  @keyframes underlineComet {
+    0% { transform: translateX(-60%); }
+    100% { transform: translateX(60%); }
+  }
+
+  @keyframes underlineCometTrail {
+    0% { transform: translateX(-80%); opacity: 0.2; }
+    50% { opacity: 0.6; }
+    100% { transform: translateX(80%); opacity: 0.2; }
+  }
+
+  @keyframes underlineDotLoop {
+    0% { transform: translate(-10%, -50%) scale(0.9); }
+    50% { transform: translate(320%, -50%) scale(1.1); }
+    100% { transform: translate(640%, -50%) scale(0.9); }
+  }
+
+  @keyframes underlineDotRing {
+    0% { opacity: 0.2; transform: translate(-20%, -50%) scale(0.5); }
+    50% { opacity: 0.7; transform: translate(320%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(660%, -50%) scale(0.5); }
+  }
+
+  @keyframes underlineFlowLoop {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 320% 50%; }
+  }
+
+  @keyframes underlineHighlightSweep {
+    0% { transform: translateX(-40%); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateX(160%); opacity: 0; }
+  }
+
+  @keyframes underlineHighlightTrail {
+    0% { transform: translateX(-60%); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: translateX(140%); opacity: 0; }
+  }
+
+  @keyframes underlineDotGlide {
+    0% { transform: translate(-10%, -50%) scale(0.9); }
+    50% { transform: translate(320%, -50%) scale(1.1); }
+    100% { transform: translate(640%, -50%) scale(0.9); }
+  }
+
+  @keyframes underlineGridDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: -60px -60px; }
+  }
+
+  @keyframes underlineParticleOrbit {
+    0% { transform: translate(-20%, -50%) scale(0.8); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translate(180%, -80%) scale(1); }
+    100% { transform: translate(420%, -40%) scale(0.8); opacity: 0; }
+  }
+
+  @keyframes underlineParticleOrbitReverse {
+    0% { transform: translate(-30%, -30%) scale(0.8); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translate(200%, -70%) scale(1); }
+    100% { transform: translate(460%, -20%) scale(0.8); opacity: 0; }
+  }
+
   @keyframes vehiclePulse {
     0%, 100% { 
       opacity: 0.7;
@@ -453,4 +965,217 @@
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
   --radius: 0.5rem;
+}
+
+/* Custom Scrollbar Styling for Modal */
+.modal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 243, 255, 0.6) rgba(0, 0, 0, 0.2);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-padding: 1rem;
+  will-change: scroll-position;
+}
+
+.modal-scrollbar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(0, 243, 255, 0.7), rgba(0, 243, 255, 0.4));
+  border-radius: 10px;
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  box-shadow: 
+    0 0 12px rgba(0, 243, 255, 0.6),
+    inset 0 0 6px rgba(0, 243, 255, 0.4),
+    0 0 20px rgba(0, 243, 255, 0.3),
+    inset 0 1px 0 rgba(0, 243, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: scrollGlow 2s ease-in-out infinite;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(0, 243, 255, 0.9), rgba(0, 243, 255, 0.6));
+  box-shadow: 
+    0 0 20px rgba(0, 243, 255, 0.9),
+    inset 0 0 10px rgba(0, 243, 255, 0.6),
+    0 0 30px rgba(0, 243, 255, 0.5);
+  transform: scaleX(1.1);
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, rgba(0, 243, 255, 1), rgba(0, 243, 255, 0.7));
+  box-shadow: 
+    0 0 25px rgba(0, 243, 255, 1),
+    inset 0 0 12px rgba(0, 243, 255, 0.8);
+}
+
+@keyframes scrollGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 12px rgba(0, 243, 255, 0.6),
+      inset 0 0 6px rgba(0, 243, 255, 0.4),
+      0 0 20px rgba(0, 243, 255, 0.3),
+      inset 0 1px 0 rgba(0, 243, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 18px rgba(0, 243, 255, 0.9),
+      inset 0 0 8px rgba(0, 243, 255, 0.6),
+      0 0 30px rgba(0, 243, 255, 0.5),
+      inset 0 1px 0 rgba(0, 243, 255, 0.4);
+  }
+}
+
+/* Footer Animations */
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes scanLine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100vw);
+    opacity: 0;
+  }
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+}
+
+/* Modules Section - Flowing Line Animations */
+@keyframes flowParticleAlongLine {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes flowGradientMove {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -60;
+    opacity: 0.4;
+  }
+}
+
+/* Breathing Glow Effect - Same as Footer Logo */
+@keyframes breathingGlow {
+  0%, 100% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.8)) drop-shadow(0 0 3px rgba(0, 243, 255, 0.6));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(0, 243, 255, 1)) drop-shadow(0 0 6px rgba(0, 243, 255, 0.9));
+  }
+}
+
+/* Diagnosis Section - Card Highlight Animation */
+.benefit-card.card-highlighted {
+  animation: cardGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes cardGlowPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 30px rgba(0, 255, 255, 0.6),
+      0 0 60px rgba(0, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.8);
+  }
+  50% {
+    box-shadow: 
+      0 0 40px rgba(0, 255, 255, 0.9),
+      0 0 80px rgba(0, 255, 255, 0.5),
+      inset 0 0 30px rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 1);
+  }
+}
+
+/* Modules Section - Popup and Star Pattern Animations */
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1) translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Minimalist underline animations */
+@keyframes underlineFlowMinimal {
+  0%, 100% {
+    background-position: -100% 0;
+  }
+  50% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes underlinePulseMinimal {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }

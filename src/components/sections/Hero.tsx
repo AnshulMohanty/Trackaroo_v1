@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import MeshBackground from "@/components/shared/MeshBackground";
+import TrackarooLogo from "@/../public/logo.jpg";
 
 export default function Hero() {
   const holoPanelRef = useRef<HTMLDivElement>(null);
@@ -10,10 +12,19 @@ export default function Hero() {
   const particlesRef = useRef<HTMLDivElement>(null);
   const [particles, setParticles] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const dataBarsRef = useRef<Array<HTMLDivElement | null>>([]);
+  const toggleDemoModal = (open: boolean) => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("demo-modal-toggle", {
+          detail: { open },
+        })
+      );
+    }
+  };
 
-  // Generate 80 floating particles
+  // Generate floating particles (reduced for performance)
   useEffect(() => {
-    const particleCount = 80;
+    const particleCount = 30;
     const newParticles = Array.from({ length: particleCount }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
@@ -21,6 +32,29 @@ export default function Hero() {
       duration: Math.random() * 5 + 5,
     }));
     setParticles(newParticles);
+  }, []);
+
+  // Initial fade-in animation for the panel
+  useEffect(() => {
+    const container = holoContainerRef.current;
+    const panel = holoPanelRef.current;
+
+    if (!container || !panel) return;
+
+    // Set initial state - invisible and slightly scaled
+    gsap.set(container, {
+      opacity: 0,
+      scale: 0.95,
+    });
+
+    // Animate in with dissolve effect
+    gsap.to(container, {
+      opacity: 1,
+      scale: 1,
+      duration: 1.2,
+      ease: "power2.out",
+      delay: 0.3,
+    });
   }, []);
 
   // 3D tilt effect on holographic panel
@@ -119,13 +153,34 @@ export default function Hero() {
         {/* Hero Section */}
         <div className="text-center mb-16" style={{ animation: "fadeInDown 1s ease-out" }}>
           <h1
-            className="text-4xl md:text-5xl lg:text-6xl font-black italic tracking-wider mb-5 text-white"
+            className="text-4xl md:text-5xl lg:text-6xl font-black italic tracking-wider mb-5 text-white relative"
             style={{
               textShadow: "0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.3)",
-              animation: "titleGlow 3s ease-in-out infinite",
+              animation: "titleGlow 3s ease-in-out infinite, textGlitch 3s ease-in-out infinite",
             }}
           >
-            ONE PLATFORM. COMPLETE CONTROL.
+            <span className="relative z-10 inline-block">ONE PLATFORM. COMPLETE CONTROL.</span>
+            {/* Glitch layers for depth effect */}
+            <span
+              className="absolute top-0 left-0 w-full text-4xl md:text-5xl lg:text-6xl font-black italic tracking-wider text-cyan-400 opacity-0 pointer-events-none"
+              style={{
+                textShadow: "2px 0 0 rgba(255, 0, 0, 0.5), -2px 0 0 rgba(0, 255, 255, 0.5)",
+                animation: "glitchLayer1 3s ease-in-out infinite",
+                clipPath: "inset(0 0 0 0)",
+              }}
+            >
+              ONE PLATFORM. COMPLETE CONTROL.
+            </span>
+            <span
+              className="absolute top-0 left-0 w-full text-4xl md:text-5xl lg:text-6xl font-black italic tracking-wider text-red-400 opacity-0 pointer-events-none"
+              style={{
+                textShadow: "-2px 0 0 rgba(0, 255, 255, 0.5), 2px 0 0 rgba(255, 0, 0, 0.5)",
+                animation: "glitchLayer2 3s ease-in-out infinite",
+                clipPath: "inset(0 0 0 0)",
+              }}
+            >
+              ONE PLATFORM. COMPLETE CONTROL.
+            </span>
           </h1>
           <p className="text-lg md:text-xl tracking-[5px] text-gray-400 uppercase" style={{ textShadow: "0 0 10px rgba(255, 255, 255, 0.3)" }}>
             Eliminate operational chaos with a unified, cloud-based dealership OS
@@ -138,7 +193,6 @@ export default function Hero() {
           className="relative w-full max-w-6xl"
           style={{
             perspective: "1500px",
-            animation: "floatIn 1.5s ease-out",
           }}
         >
           {/* Main Holographic Panel */}
@@ -226,10 +280,25 @@ export default function Hero() {
                   desc="Streamline processes with intelligent automation"
                   status="OPTIMIZED"
                 />
+                <HoloCard
+                  icon={
+                    <svg className="w-12 h-12 mb-4" viewBox="0 0 50 50" fill="none" stroke="#00ffff" strokeWidth="2" style={{ filter: "drop-shadow(0 0 10px #00ffff)", animation: "iconFloat 3s ease-in-out infinite" }}>
+                      <circle cx="25" cy="20" r="6" />
+                      <path d="M 25,14 L 25,26 M 19,20 L 31,20" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M 15,35 Q 25,30 35,35" strokeWidth="1.5" />
+                      <circle cx="20" cy="38" r="2" fill="#00ffff" />
+                      <circle cx="25" cy="40" r="2" fill="#00ffff" />
+                      <circle cx="30" cy="38" r="2" fill="#00ffff" />
+                    </svg>
+                  }
+                  title="Smart Notifications"
+                  desc="Stay updated with automated alerts for critical events"
+                  status="NOTIFYING"
+                />
               </div>
 
               {/* Central Rotating Hologram */}
-              <div className="relative w-[200px] h-[200px] md:w-[250px] md:h-[250px]" style={{ animation: "holoRotate 8s linear infinite" }}>
+              <div className="relative w-[200px] h-[200px] md:w-[250px] md:h-[250px] group" style={{ animation: "holoRotate 8s linear infinite" }}>
                 <div
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-[3px] border-cyan-400/60 rounded-full"
                   style={{
@@ -258,13 +327,27 @@ export default function Hero() {
                   }}
                 />
                 <div
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl md:text-2xl font-bold text-cyan-400 text-center"
-                  style={{
-                    textShadow: "0 0 20px #00ffff",
-                    letterSpacing: "2px",
-                  }}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                  style={{ perspective: "1200px" }}
                 >
-                  TRACKAROO
+                  <div
+                    className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border border-cyan-300/70 bg-[#031125] shadow-[0_0_30px_rgba(0,255,255,0.35)] transition-[transform,box-shadow] duration-700 [transform:rotateX(12deg)_rotateY(-6deg)] group-hover:[transform:rotateX(2deg)_rotateY(4deg)_scale(1.08)] group-hover:shadow-[0_0_44px_rgba(0,255,255,0.65)]"
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-cyan-900/40" />
+                    <Image
+                      src={TrackarooLogo}
+                      alt="Trackaroo kangaroo emblem"
+                      fill
+                      sizes="(max-width: 768px) 112px, 144px"
+                      priority
+                      className="object-cover scale-[1.55] -translate-y-1"
+                      style={{ objectPosition: "50% 34%" }}
+                    />
+                    <div className="absolute inset-0 rounded-full border border-white/25 mix-blend-soft-light" />
+                    <div className="absolute inset-0 rounded-full shadow-[inset_0_0_22px_rgba(0,0,0,0.65)]" />
+                    <div className="absolute -inset-5 rounded-full bg-cyan-400/25 blur-3xl opacity-60" aria-hidden />
+                  </div>
                 </div>
               </div>
 
@@ -283,76 +366,79 @@ export default function Hero() {
                 <HoloCard
                   icon={
                     <svg className="w-12 h-12 mb-4" viewBox="0 0 50 50" fill="none" stroke="#00ffff" strokeWidth="2" style={{ filter: "drop-shadow(0 0 10px #00ffff)", animation: "iconFloat 3s ease-in-out infinite" }}>
+                      {/* Bar Chart */}
                       <rect x="10" y="30" width="8" height="15" />
                       <rect x="21" y="20" width="8" height="25" />
                       <rect x="32" y="25" width="8" height="20" />
+                      {/* Base line */}
+                      <line x1="8" y1="45" x2="42" y2="45" strokeWidth="1.5" />
+                      {/* Trend line overlay */}
+                      <path d="M 14,30 Q 25,20 38,25" strokeWidth="1.5" strokeDasharray="2,2" opacity="0.6" />
+                      {/* Data points */}
+                      <circle cx="14" cy="30" r="2" fill="#00ffff" />
+                      <circle cx="25" cy="20" r="2" fill="#00ffff" />
+                      <circle cx="38" cy="25" r="2" fill="#00ffff" />
                     </svg>
                   }
                   title="Performance Metrics"
-                  desc="Track KPIs and improve efficiency continuously"
+                  desc="Track KPIs and improve operations efficiency"
                   status="MONITORING"
+                />
+                <HoloCard
+                  icon={
+                    <svg className="w-12 h-12 mb-4" viewBox="0 0 50 50" fill="none" stroke="#00ffff" strokeWidth="2" style={{ filter: "drop-shadow(0 0 10px #00ffff)", animation: "iconFloat 3s ease-in-out infinite" }}>
+                      <rect x="12" y="12" width="26" height="26" rx="2" />
+                      <path d="M 20,25 L 22,27 L 30,19" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="25" cy="35" r="4" />
+                      <path d="M 25,39 L 25,42 M 25,39 L 22,41 M 25,39 L 28,41" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  }
+                  title="Data Security & Compliance"
+                  desc="Protect business data with secure, compliant storage and access controls"
+                  status="SECURED"
                 />
               </div>
             </div>
 
-            {/* Vehicle Display */}
-            <div className="mt-10 text-center">
-              <svg
-                className="w-[200px] h-[100px] mx-auto mb-5"
-                viewBox="0 0 200 100"
-                fill="none"
-                stroke="#00ffff"
-                strokeWidth="2"
-                style={{
-                  filter: "drop-shadow(0 0 20px #00ffff)",
-                  animation: "vehiclePulse 3s ease-in-out infinite",
-                }}
-              >
-                <path d="M 20,60 L 40,40 L 80,40 L 100,60 Z" />
-                <path d="M 100,60 L 120,40 L 160,40 L 180,60 Z" />
-                <line x1="20" y1="60" x2="180" y2="60" strokeWidth="3" />
-                <circle cx="50" cy="60" r="12" />
-                <circle cx="50" cy="60" r="8" />
-                <circle cx="150" cy="60" r="12" />
-                <circle cx="150" cy="60" r="8" />
-                <rect x="45" y="45" width="10" height="10" />
-                <rect x="80" y="45" width="10" height="10" />
-                <rect x="130" y="45" width="10" height="10" />
-              </svg>
-              <div className="flex gap-2.5 justify-center mt-5">
-                <DataBar ref={(el) => { dataBarsRef.current[0] = el; }} height={70} delay={0.1} />
-                <DataBar ref={(el) => { dataBarsRef.current[1] = el; }} height={85} delay={0.3} />
-                <DataBar ref={(el) => { dataBarsRef.current[2] = el; }} height={60} delay={0.5} />
-                <DataBar ref={(el) => { dataBarsRef.current[3] = el; }} height={90} delay={0.7} />
-              </div>
-            </div>
           </div>
         </div>
 
         {/* CTA Button */}
-        <div className="mt-16 text-center">
-          <a
-            href="#"
-            className="inline-flex items-center justify-center px-12 py-5 bg-cyan-400/10 border-[3px] border-cyan-400 rounded-[50px] text-cyan-400 text-lg md:text-xl font-bold uppercase tracking-[2px] cursor-pointer relative overflow-hidden transition-all duration-400"
-            style={{
-              boxShadow: "0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.05)",
-              animation: "buttonPulse 2s ease-in-out infinite",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(0, 255, 255, 0.2)";
-              e.currentTarget.style.transform = "scale(1.05)";
-              e.currentTarget.style.boxShadow = "0 0 60px rgba(0, 255, 255, 0.6), inset 0 0 40px rgba(0, 255, 255, 0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(0, 255, 255, 0.1)";
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "0 0 30px rgba(0, 255, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.05)";
-            }}
+        <div className="mt-16 flex items-center justify-center">
+          <button
+            onClick={() => toggleDemoModal(true)}
+            className="group relative flex w-full max-w-[460px] items-center gap-6 rounded-[32px] border border-cyan-400/50 bg-gradient-to-r from-[#041228]/90 via-[#071c34]/80 to-[#041228]/90 px-8 py-5 text-left text-white shadow-[0_0_35px_rgba(0,255,255,0.25)] transition-all duration-500 hover:border-cyan-200/80 hover:shadow-[0_0_55px_rgba(0,255,255,0.45)]"
+            style={{ backdropFilter: "blur(18px)" }}
+            aria-label="Start your engine"
           >
-            <span className="relative z-10">TURN THE ENGINE ON</span>
-          </a>
+            <span className="pointer-events-none absolute inset-0 rounded-[32px] bg-[radial-gradient(circle_at_30%_20%,rgba(0,255,255,0.25),transparent_55%)] opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+            {/* Engine dial */}
+            <span className="relative flex h-16 w-16 items-center justify-center">
+              <span className="absolute inset-0 rounded-full bg-gradient-to-b from-cyan-500/40 to-blue-900/60 blur-lg opacity-70 transition-opacity duration-500 group-hover:opacity-100" />
+              <span className="relative flex h-full w-full items-center justify-center rounded-full border border-cyan-300/70 bg-black/60 shadow-[inset_0_0_25px_rgba(0,0,0,0.8)]">
+                <span className="absolute inset-[6px] rounded-full border border-cyan-400/60 opacity-70" />
+                <span className="absolute inset-[12px] rounded-full border border-cyan-200/30" />
+                <span className="absolute inset-[18px] rounded-full border border-cyan-200/20" />
+                <span className="absolute bottom-3 left-1/2 h-6 w-0.5 origin-bottom -translate-x-1/2 rounded-full bg-gradient-to-b from-white to-cyan-400 transition-transform duration-500 group-hover:-rotate-45" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.4em] text-cyan-100">Start</span>
+              </span>
+            </span>
+            {/* Text */}
+            <div className="relative flex flex-col">
+              <span className="text-xs uppercase tracking-[0.5em] text-cyan-300/80"> ignition </span>
+              <span className="font-heading text-2xl uppercase tracking-[0.2em]">Start your engine</span>
+              <span className="text-[11px] uppercase tracking-[0.6em] text-cyan-200/80"> launch demo </span>
+            </div>
+            {/* Motion trails */}
+            <div className="ml-auto flex h-14 w-28 flex-col justify-between">
+              <span className="h-1 w-full origin-left scale-x-75 rounded-full bg-gradient-to-r from-transparent via-cyan-300/70 to-cyan-200/0 transition-all duration-500 group-hover:scale-x-100 group-hover:translate-x-2" />
+              <span className="h-1 w-4/5 origin-left scale-x-50 rounded-full bg-gradient-to-r from-transparent via-cyan-300/70 to-cyan-200/0 transition-all duration-500 group-hover:scale-x-100 group-hover:translate-x-4 delay-75" />
+              <span className="h-1 w-1/2 origin-left scale-x-50 rounded-full bg-gradient-to-r from-transparent via-cyan-300/70 to-cyan-200/0 transition-all duration-500 group-hover:scale-x-100 group-hover:translate-x-6 delay-150" />
+            </div>
+          </button>
         </div>
       </div>
+
     </section>
   );
 }
